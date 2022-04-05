@@ -1,0 +1,3 @@
+- From Local storage Upload Data to Bucket Using CRUD Package you've already written  ( Yellow Taxi or any BIG file (preferably csv's and other file types )
+- Using Airflow (listener) and CloudFunction (CF) Transfer data from Bucket To Updated_Bucket if original file has been changed!
+- Transfer data from Updated_Bucket to Cloud PostgresSQL (Only *.csv obviously). You are free to use any (non-local) technology for this.
