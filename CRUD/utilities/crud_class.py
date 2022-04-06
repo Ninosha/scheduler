@@ -1,5 +1,5 @@
 from datetime import datetime
-from utils import get_blob, check_if_updated, get_hash
+from CRUD.utilities.utils import get_blob, get_hash, check_if_updated, logs_csv
 
 
 class CRUDFuncs:
@@ -24,11 +24,11 @@ class CRUDFuncs:
         try:
             blobs_list = list(self.bucket.list_blobs())
             if file_name in blobs_list:
+                raise f"{file_name} already exists in {self.bucket}"
+            else:
                 get_blob(self.bucket, file_name).upload_from_filename(
                     file_path)
                 return f"{file_name} was uploaded"
-            else:
-                raise f"{file_name} already exists in {self.bucket}"
 
         except FileNotFoundError as f:
             raise FileNotFoundError(f)
@@ -66,11 +66,19 @@ class CRUDFuncs:
         """
         try:
             old_hash = get_hash(self.bucket, file_name)
+
             self.bucket.delete_blob(file_name)
-            blob = get_blob(self.bucket, file_name). \
+            get_blob(self.bucket, file_name). \
                 upload_from_filename(filepath)
+
             new_hash = get_hash(self.bucket, file_name)
-            check_if_updated(blob, old_hash, new_hash)
+            data = check_if_updated(file_name, old_hash, new_hash)
+            logs_csv(data)
+
+            get_blob(self.bucket, "logs.csv"). \
+                upload_from_filename("/home/ninosha/Desktop/"
+                                     "GCP_task_scheduler/listener_data"
+                                     "/logs.csv")
 
             return f"{file_name} was updated"
 

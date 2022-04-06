@@ -36,7 +36,7 @@ def make_composer2_web_server_request(url: str, method: str = "GET", **kwargs: A
 def trigger_dag(web_server_url: str, dag_id: str, data: dict) -> str:
     """
     Make a request to trigger a dag using the stable Airflow 2 REST API.
-    https://airflow.apache.org/docs/apache-airflow/stable/stable-rest-api-ref.html
+    https://airflow.apache.org/docs/apache-airflow/stable/s0table-rest-api-ref.html
 
     Args:
       web_server_url: The URL of the Airflow 2 web server.

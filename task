@@ -8,5 +8,5 @@
 
 
 
-make cloud function to listen update by hash trigger dag whenever hash
-changed dag moves file from bucket to bucket
+CloudFunctionInvokeFunctionOperator
+GCSObjectUpdateSensor

@@ -14,3 +14,6 @@ with airflow.DAG(
     # Cloud Storage object change.
     print_gcs_info = BashOperator(
         task_id='print_gcs_info', bash_command='echo {{ dag_run.conf }}')
+
+
+
