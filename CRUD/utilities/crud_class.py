@@ -1,5 +1,5 @@
 from datetime import datetime
-from utils import get_blob
+from utils import get_blob, check_if_updated, get_hash
 
 
 class CRUDFuncs:
@@ -17,18 +17,18 @@ class CRUDFuncs:
         """
         uploads file from file path to bucket
 
-        :param file_name:
+        :param file_name: str/file name
         :param file_path: str/file path
         :return: message if operation was successful, else - error
         """
         try:
-            get_blob(self.bucket, file_name).upload_from_filename(
-                file_path)
-            time_now = datetime.now()
-            # data = [file_name,
-            #         "created",
-            #         str(time_now)]
-            # logs_csv(data)
+            blobs_list = list(self.bucket.list_blobs())
+            if file_name in blobs_list:
+                get_blob(self.bucket, file_name).upload_from_filename(
+                    file_path)
+                return f"{file_name} was uploaded"
+            else:
+                raise f"{file_name} already exists in {self.bucket}"
 
         except FileNotFoundError as f:
             raise FileNotFoundError(f)
@@ -40,7 +40,7 @@ class CRUDFuncs:
         """
         downloads requested file to passed path
 
-        :param file_name:
+        :param file_name: str/file name
         :param path_to_download: string url
         :return: message if operation was successful, else - error
         """
@@ -48,11 +48,8 @@ class CRUDFuncs:
             get_blob(self.bucket, file_name). \
                 download_to_filename(f"{path_to_download}/"
                                      f"{file_name}")
-            time_now = datetime.now()
-            # data = [file_name,
-            #         "read",
-            #         str(time_now)]
-            # logs_csv(data)
+
+            return f"{file_name} was read"
 
         except FileNotFoundError as f:
             raise FileNotFoundError(f)
@@ -63,21 +60,19 @@ class CRUDFuncs:
     def update_file(self, file_name, filepath):
         """
         updates file from file path to bucket
-        :param file_name:
+        :param file_name: str/file name
         :param filepath: str/file path
         :return: message if operation was successful, else - error
         """
         try:
-
+            old_hash = get_hash(self.bucket, file_name)
             self.bucket.delete_blob(file_name)
-            get_blob(self.bucket, file_name).upload_from_filename(
-                filepath)
+            blob = get_blob(self.bucket, file_name). \
+                upload_from_filename(filepath)
+            new_hash = get_hash(self.bucket, file_name)
+            check_if_updated(blob, old_hash, new_hash)
 
-            time_now = datetime.now()
-            # data = [file_name,
-            #         "updated",
-            #         str(time_now)]
-            # logs_csv(data)
+            return f"{file_name} was updated"
 
         except FileNotFoundError as f:
             raise FileNotFoundError(f)
@@ -87,12 +82,17 @@ class CRUDFuncs:
 
     def delete_file(self, file_name):
         """
-        deletes file with obj filename
+        deletes file with filename
+        :param file_name: str/file name
         :return: message if operation was successful, else - error
         """
-        self.bucket.delete_blob(file_name)
-        time_now = datetime.now()
-        # data = [file_name,
-        #         "deleted",
-        #         str(time_now)]
-        # logs_csv(data)
+        try:
+            self.bucket.delete_blob(file_name)
+
+            return f"{file_name} was deleted"
+
+        except FileNotFoundError as f:
+            raise FileNotFoundError(f)
+
+        except NotImplementedError as f:
+            raise NotImplementedError(f)
