@@ -2,11 +2,14 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
-from airflow.providers.google.cloud.sensors.gcs import GCSObjectUpdateSensor
-from airflow.providers.google.cloud.operators.functions import \
-    CloudFunctionInvokeFunctionOperator
+from airflow.providers.google.cloud.sensors.gcs import \
+    GCSObjectUpdateSensor
 from google.cloud import storage
 import pandas as pd
+from airflow.providers.google.common.utils import \
+    id_token_credentials as id_token_credential_utils
+import google.auth.transport.requests
+from google.auth.transport.requests import AuthorizedSession
 
 
 def updated_file_name():
@@ -18,6 +21,22 @@ def updated_file_name():
     df = pd.read_csv(file)
     file_name = df["file"].iloc[-1]
     Variable.set(key="file_name", value=file_name)
+
+
+def invoke_cloud_function():
+    url = "https://us-central1-fair-solution-345912.cloudfunctions" \
+          ".net/function-2"  # the url is also the target audience.
+    request = google.auth.transport.requests.Request()  # this is a
+    # request for obtaining the the credentials
+    id_token_credentials = id_token_credential_utils. \
+        get_default_id_token_credentials(
+        url,
+        request=request
+    )  # If your cloud function url has query
+    # parameters, remove them before passing to the audience
+
+    resp = AuthorizedSession(id_token_credentials).request("GET",
+                                                           url=url)
 
 
 default_args = {
@@ -56,6 +75,9 @@ t2 = PythonOperator(
     python_callable=updated_file_name,
     dag=dag
 )
+
+t3 = PythonOperator(task_id="invoke_cf",
+                    python_callable=invoke_cloud_function)
 
 # t3 = CloudFunctionInvokeFunctionOperator(
 #     function_id="ID of the function to be called str",
