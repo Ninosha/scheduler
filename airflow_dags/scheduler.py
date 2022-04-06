@@ -66,7 +66,7 @@ dag = DAG(
 
 t1 = GCSObjectUpdateSensor(
     task_id='gcs_file_sensor_yesterday_task',
-    bucket='myBucketName',
+    bucket='crudtask',
     object="logs.csv"
 )
 
