@@ -15,12 +15,16 @@ from google.auth.transport.requests import AuthorizedSession
 def updated_file_name():
     PROJECT_name = "My First Project"
     BUCKET_name = "crudtask"
+
     client = storage.Client()
     bucket = client.bucket(BUCKET_name, PROJECT_name)
+
     file = bucket.blob("logs.csv")
-    df = pd.read_csv(file)
-    file_name = df["file"].iloc[-1]
-    Variable.set(key="file_name", value=file_name)
+
+    df = pd.read_json(file)
+    file_name = [file for file in df if df[file]["status"] == "updated"]
+    if file_name:
+        Variable.set(key="file_name", value=file_name)
 
 
 def invoke_cloud_function():
@@ -30,13 +34,16 @@ def invoke_cloud_function():
     # request for obtaining the the credentials
     id_token_credentials = id_token_credential_utils. \
         get_default_id_token_credentials(
-        url,
-        request=request
-    )  # If your cloud function url has query
-    # parameters, remove them before passing to the audience
+            url,
+            request=request
+        )
 
-    resp = AuthorizedSession(id_token_credentials).request("GET",
-                                                           url=url)
+    filename = Variable.get("file_name")
+    AuthorizedSession(id_token_credentials).request(
+        method="POST",
+        url=url,
+        json={"filename": filename}
+    )
 
 
 default_args = {
@@ -64,19 +71,22 @@ dag = DAG(
     tags=['example'],
 )
 
-t1 = GCSObjectUpdateSensor(
-    task_id='gcs_file_sensor_yesterday_task',
-    bucket='crudtask',
-    object="logs.csv"
-)
+# t1 = GCSObjectUpdateSensor(
+#     task_id='gcs_file_sensor_yesterday_task',
+#     bucket='crudtask',
+#     object="logs.csv",
+#     ts_func = ,
+#     dag=dag,
+#
+# )
 
-t2 = PythonOperator(
+t1 = PythonOperator(
     task_id='get_folders',
     python_callable=updated_file_name,
     dag=dag
 )
 
-t3 = PythonOperator(task_id="invoke_cf",
+t2 = PythonOperator(task_id="invoke_cf",
                     python_callable=invoke_cloud_function)
 
 # t3 = CloudFunctionInvokeFunctionOperator(

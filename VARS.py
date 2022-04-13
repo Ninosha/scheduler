@@ -1,0 +1,1 @@
+logs_path = "/home/ninosha/Desktop/GCP_task_scheduler/listener_data/history.json"

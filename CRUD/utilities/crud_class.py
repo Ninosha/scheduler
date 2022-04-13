@@ -1,5 +1,5 @@
-from datetime import datetime
-from CRUD.utilities.utils import get_blob, get_hash, check_if_updated, logs_csv
+from CRUD.utilities.utils import get_blob, get_hash, check_if_updated,\
+    logs_json
 
 
 class CRUDFuncs:
@@ -73,12 +73,12 @@ class CRUDFuncs:
 
             new_hash = get_hash(self.bucket, file_name)
             data = check_if_updated(file_name, old_hash, new_hash)
-            logs_csv(data)
+            logs_json(data)
 
-            get_blob(self.bucket, "logs.csv"). \
+            get_blob(self.bucket, "history.json"). \
                 upload_from_filename("/home/ninosha/Desktop/"
                                      "GCP_task_scheduler/listener_data"
-                                     "/logs.csv")
+                                     "/history.json")
 
             return f"{file_name} was updated"
 

@@ -3,6 +3,7 @@ import json
 import os
 from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials
+from VARS import logs_path
 
 
 def jsonfile_to_dict(url):
@@ -19,8 +20,14 @@ def jsonfile_to_dict(url):
 def check_if_updated(file_name, old_hash, new_hash):
     time_now = datetime.now()
     if old_hash != new_hash:
-        data = [file_name,
-                str(time_now), "updated"]
+        data = {file_name: {"time":
+                str(time_now), "status": "updated"}}
+
+        return data
+    else:
+        data = {file_name: {"time":
+                str(time_now), "status": "not updated"}}
+
         return data
 
 
@@ -31,18 +38,23 @@ def get_hash(bucket, file_name):
     return file_hash
 
 
-def logs_csv(data):
-    path = "/home/ninosha/Desktop/GCP_task_scheduler" \
-           "/listener_data/logs.csv"
-    with open(path, 'a+', newline='') as csvfile:
-        writer = csv.writer(csvfile, delimiter=',')
-        columns = ["file", "time", "status", "hash"]
-        if os.stat(path).st_size != 0:
-            print(os.stat(path).st_size)
-            writer.writerow(data)
-        else:
-            writer.writerow(columns)
-            writer.writerow(data)
+def read_json(path):
+    with open(path, "r") as file:
+        return json.load(file)
+
+
+def write_json(path, data):
+    with open(path, "w") as file:
+        return json.dump(data, file)
+
+
+def logs_json(data):
+    try:
+        history_dict = read_json(logs_path)
+        history_dict.update(data)
+        write_json(logs_path, history_dict)
+    except Exception as f:
+        write_json(logs_path, data)
 
 
 def get_blob(bucket, file_name=None):
