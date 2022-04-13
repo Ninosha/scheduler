@@ -17,7 +17,7 @@ file_path_create = "/home/ninosha/Desktop/GCP_task_scheduler/Data/" \
 
 # obj.crud_obj.creat_file("sh.csv", file_path_create)
 
-# obj.crud_obj.update_file("sh.csv", file_path_create)
+obj.crud_obj.update_file("sh.csv", file_path_create)
 # obj.crud_obj.update_file("hvhj.csv", file_path_create)
 #
 # print(obj.crud_obj.read_file("hvhj.csv",

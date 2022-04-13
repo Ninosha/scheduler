@@ -19,30 +19,32 @@ def updated_file_name():
     client = storage.Client()
     bucket = client.bucket(BUCKET_name, PROJECT_name)
 
-    file = bucket.blob("logs.csv")
+    file = bucket.blob("history.json")
+    print(file)
 
-    df = pd.read_json(file)
-    file_name = [file for file in df if df[file]["status"] == "updated"]
-    if file_name:
-        Variable.set(key="file_name", value=file_name)
+    df = pd.read_json("gs://crudtask/history.json")
+
+    file_name_list = [filename for filename in df
+                      if df[filename]["status"] == "updated"]
+
+    if file_name_list:
+        Variable.set(key="file_names", value=file_name_list)
 
 
 def invoke_cloud_function():
-    url = "https://us-central1-fair-solution-345912.cloudfunctions" \
-          ".net/function-2"  # the url is also the target audience.
+    url = "https://europe-west1-fair-solution-345912.cloudfunctions" \
+          ".net/to_update_bucket"
+    # the url is also the target audience.
     request = google.auth.transport.requests.Request()  # this is a
     # request for obtaining the the credentials
     id_token_credentials = id_token_credential_utils. \
-        get_default_id_token_credentials(
-            url,
-            request=request
-        )
+        get_default_id_token_credentials(url, request=request)
 
-    filename = Variable.get("file_name")
+    filenames = Variable.get("file_names")
     AuthorizedSession(id_token_credentials).request(
         method="POST",
         url=url,
-        json={"filename": filename}
+        json={"filenames": filenames}
     )
 
 
@@ -65,7 +67,7 @@ dag = DAG(
         'retry_delay': timedelta(minutes=5)
     },
     description='A simple tutorial DAG',
-    schedule_interval=timedelta(days=1),
+    schedule_interval="* * * * *",
     start_date=datetime(2021, 1, 1),
     catchup=False,
     tags=['example'],
