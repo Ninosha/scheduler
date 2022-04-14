@@ -10,14 +10,27 @@ from google.auth.transport.requests import AuthorizedSession
 
 
 def updated_file_name():
-
+    """
+    function listens to blob updates on a specific bucket/
+    sets updated files list in airflow environment variables
+    :return: str/message
+    """
+    
     BUCKET_name = "crudtask"
+    try:
 
-    client = storage.Client()
-    bucket = client.get_bucket(BUCKET_name)
-    blobs_list = bucket.list_blobs()
-    updated_files = [blob for blob in blobs_list if blob.metadata
-                     and blob.metadata["status"] == "updated"]
+        client = storage.Client()
+        bucket = client.get_bucket(BUCKET_name)
+
+        blobs_list = bucket.list_blobs()
+        updated_files = [blob for blob in blobs_list if blob.metadata
+                         and blob.metadata["status"] == "updated"]
+
+    except ConnectionError as f:
+        return ConnectionError(f)
+
+    except NotImplementedError as f:
+        return NotImplementedError(f)
 
     blob_names = []
     for blob in updated_files:
@@ -27,27 +40,46 @@ def updated_file_name():
 
     Variable.set(key="file_names", value=blob_names)
 
+    return "result set as airflow environment variable"
+
 
 def invoke_cloud_function():
+    """
+    function triggers specific cloud function and passes filenames list
+    to function via request
 
-    updated_files_list = eval(Variable.get("file_names"))
+    :return: str/message
+    """
+    try:
+
+        updated_files_list = eval(Variable.get("file_names"))
+
+    except ValueError as e:
+        return ValueError(e)
 
     if updated_files_list:
-        url = "https://europe-west1-fair-solution-345912.cloudfunctions" \
-              ".net/to_update_bucket"
-        # the url is also the target audience.
-        request = google.auth.transport.requests.Request()  # this is a
-        # request for obtaining the the credentials
-        id_token_credentials = id_token_credential_utils. \
-            get_default_id_token_credentials(url, request=request)
+        url = "https://europe-west1-fair-solution-345912." \
+              "cloudfunctions.net/to_update_bucket"
+        try:
+            request = google.auth.transport.requests.Request()
+            id_token_credentials = id_token_credential_utils. \
+                get_default_id_token_credentials(url, request=request)
 
-        AuthorizedSession(id_token_credentials).request(
-            method="POST",
-            url=url,
-            json={"updated_files": updated_files_list}
-        )
+            AuthorizedSession(id_token_credentials).request(
+                method="POST",
+                url=url,
+                json={"updated_files": updated_files_list}
+            )
+            return "function triggered"
+
+        except ConnectionError as f:
+            return ConnectionError(f)
+
+        except NotImplementedError as f:
+            return NotImplementedError(f)
+
     else:
-        print("files were not updated")
+        return "files were not updated/function not triggered"
 
 
 dag = DAG(

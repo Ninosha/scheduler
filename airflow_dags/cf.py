@@ -57,16 +57,24 @@ current_time = now.strftime("%H:%M:%S")
 
 
 def move_blob(request):
+    """
+    copies given file/files from cloud composer request from source
+    bucket to destination bucket
+
+    :param request: request sent from cloud composer
+    :return: str/message
+    """
+    # request data
     request_json = request.get_json()
     file_names_list = request_json["updated_files"]
 
-    """Copies a blob from one bucket to another with a new name."""
+    # needed variables
     bucket_name = os.environ.get("bucket_name")
-    # blob_name = "your-object-name"
+
     destination_bucket_name = os.environ.get("destination_bucket_name")
-    # destination_blob_name = "destination-object-name"
 
     now = datetime.now()
+
     current_time = now.strftime("%H:%M:%S")
 
     storage_client = storage.Client()
@@ -75,24 +83,28 @@ def move_blob(request):
 
     destination_bucket = storage_client.bucket(destination_bucket_name)
 
+    # moving files from bucket to updated bucket
     for blob_name in file_names_list:
+        try:
+            source_blob = source_bucket.blob(blob_name)
 
-        source_blob = source_bucket.blob(blob_name)
+            destination_blob_name = f"updated_{blob_name}_{current_time}"
 
-        destination_blob_name = f"updated_{blob_name}_{current_time}"
-
-        blob_copy = source_bucket.copy_blob(
-            source_blob, destination_bucket, destination_blob_name
-        )
-
-        print(
-            "Blob {} in bucket {} copied to blob {} in bucket {}.".format(
-                source_blob.name,
-                source_bucket.name,
-                blob_copy.name,
-                destination_bucket.name,
+            blob_copy = source_bucket.copy_blob(
+                source_blob, destination_bucket, destination_blob_name
             )
-        )
+            return f"File/files {', '.join(file_names_list)}" \
+                   f" moved successfully"
+
+        except FileNotFoundError as e:
+            FileNotFoundError(e)
+
+        except NotADirectoryError as e:
+            NotADirectoryError(e)
+
+        except NotImplementedError as e:
+            NotImplementedError(e)
+
 
 
 google - cloud - storage
