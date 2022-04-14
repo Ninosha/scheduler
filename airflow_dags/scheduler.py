@@ -18,17 +18,16 @@ def updated_file_name():
 
     client = storage.Client()
     bucket = client.bucket(BUCKET_name, PROJECT_name)
+    blobs_list = bucket.list_blobs()
+    updated_blobs = [blob for blob in blobs_list
+                     if blob.metadata["status"] == "updated"]
 
-    file = bucket.blob("history.json")
-    print(file)
+    if updated_blobs:
+        Variable.set(key="file_names", value=updated_blobs)
 
-    df = pd.read_json("gs://crudtask/history.json")
-
-    file_name_list = [filename for filename in df
-                      if df[filename]["status"] == "updated"]
-
-    if file_name_list:
-        Variable.set(key="file_names", value=file_name_list)
+    for blob in updated_blobs:
+        blob.metadata = None
+        blob.patch()
 
 
 def invoke_cloud_function():

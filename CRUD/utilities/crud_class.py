@@ -1,5 +1,4 @@
-from CRUD.utilities.utils import get_blob, get_hash, check_if_updated,\
-    logs_json
+from CRUD.utilities.utils import get_blob, get_hash, check_if_updated
 
 
 class CRUDFuncs:
@@ -64,21 +63,18 @@ class CRUDFuncs:
         :param filepath: str/file path
         :return: message if operation was successful, else - error
         """
+
+        blob = get_blob(self.bucket, file_name)
+
         try:
             old_hash = get_hash(self.bucket, file_name)
 
             self.bucket.delete_blob(file_name)
-            get_blob(self.bucket, file_name). \
-                upload_from_filename(filepath)
+            blob.upload_from_filename(filepath)
 
             new_hash = get_hash(self.bucket, file_name)
-            data = check_if_updated(file_name, old_hash, new_hash)
-            logs_json(data)
 
-            get_blob(self.bucket, "history.json"). \
-                upload_from_filename("/home/ninosha/Desktop/"
-                                     "GCP_task_scheduler/listener_data"
-                                     "/history.json")
+            check_if_updated(blob, old_hash, new_hash)
 
             return f"{file_name} was updated"
 

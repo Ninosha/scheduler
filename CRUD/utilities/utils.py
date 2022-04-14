@@ -17,18 +17,12 @@ def jsonfile_to_dict(url):
     return to_dict
 
 
-def check_if_updated(file_name, old_hash, new_hash):
-    time_now = datetime.now()
+def check_if_updated(blob, old_hash, new_hash):
+
     if old_hash != new_hash:
-        data = {file_name: {"time":
-                str(time_now), "status": "updated"}}
-
-        return data
-    else:
-        data = {file_name: {"time":
-                str(time_now), "status": "not updated"}}
-
-        return data
+        metadata = {"status": "updated"}
+        blob.metadata = metadata
+        blob.patch()
 
 
 def get_hash(bucket, file_name):
@@ -38,24 +32,15 @@ def get_hash(bucket, file_name):
     return file_hash
 
 
-def read_json(path):
-    with open(path, "r") as file:
-        return json.load(file)
-
-
-def write_json(path, data):
-    with open(path, "w") as file:
-        return json.dump(data, file)
-
-
-def logs_json(data):
-    try:
-        history_dict = read_json(logs_path)
-        history_dict.update(data)
-        write_json(logs_path, history_dict)
-    except Exception as f:
-        write_json(logs_path, data)
-
+# def read_json(path):
+#     with open(path, "r") as file:
+#         return json.load(file)
+#
+#
+# def write_json(path, data):
+#     with open(path, "w") as file:
+#         return json.dump(data, file)
+#
 
 def get_blob(bucket, file_name=None):
     return bucket.blob(file_name)
