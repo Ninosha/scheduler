@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
@@ -10,24 +10,29 @@ from google.auth.transport.requests import AuthorizedSession
 
 
 def updated_file_name():
+
     BUCKET_name = "crudtask"
 
     client = storage.Client()
     bucket = client.get_bucket(BUCKET_name)
     blobs_list = bucket.list_blobs()
-    updated_blobs = [blob for blob in blobs_list if blob.metadata and
-                     blob.metadata["status"] == "updated"]
+    updated_files = [blob for blob in blobs_list if blob.metadata
+                     and blob.metadata["status"] == "updated"]
 
-    Variable.set(key="file_names", value=updated_blobs)
-
-    for blob in updated_blobs:
+    blob_names = []
+    for blob in updated_files:
         blob.metadata = {"status": "not updated"}
         blob.patch()
+        blob_names.append(blob.name)
+
+    Variable.set(key="file_names", value=blob_names)
 
 
 def invoke_cloud_function():
-    filenames = Variable.get("file_names")
-    if filenames:
+
+    updated_files_list = eval(Variable.get("file_names"))
+
+    if updated_files_list:
         url = "https://europe-west1-fair-solution-345912.cloudfunctions" \
               ".net/to_update_bucket"
         # the url is also the target audience.
@@ -39,10 +44,10 @@ def invoke_cloud_function():
         AuthorizedSession(id_token_credentials).request(
             method="POST",
             url=url,
-            json={"updated_blobs": filenames}
+            json={"updated_files": updated_files_list}
         )
     else:
-        return "files were not updated"
+        print("files were not updated")
 
 
 dag = DAG(
@@ -69,6 +74,7 @@ t1 = PythonOperator(
 #
 t2 = PythonOperator(task_id="invoke_cf",
                     python_callable=invoke_cloud_function)
+
 
 # t3 = CloudFunctionInvokeFunctionOperator(
 #     function_id="ID of the function to be called str",

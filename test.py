@@ -21,3 +21,9 @@ obj.crud_obj.update_file("as.csv", file_path_create)
 # print(obj.crud_obj.read_file("hvhj.csv",
 # "/home/ninosha/Desktop/GCP_task_scheduler/Downloads"))
 # obj.crud_obj.delete_file("hvhj.csv")
+import json
+k = '["crudtask", "as.csv"]'
+
+# m = json.loads(k)
+print(eval(k))
+

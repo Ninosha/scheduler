@@ -75,7 +75,7 @@ class CRUDFuncs:
             new_hash = get_hash(self.bucket, file_name)
 
             check_if_updated(blob, old_hash, new_hash)
-            print(blob.metadata["status"])
+            print(blob)
             return f"{file_name} was updated"
 
         except FileNotFoundError as f:
