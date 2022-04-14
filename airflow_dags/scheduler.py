@@ -2,10 +2,7 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
-from airflow.providers.google.cloud.sensors.gcs import \
-    GCSObjectUpdateSensor
 from google.cloud import storage
-import pandas as pd
 from airflow.providers.google.common.utils import \
     id_token_credentials as id_token_credential_utils
 import google.auth.transport.requests
@@ -17,34 +14,38 @@ def updated_file_name():
     BUCKET_name = "crudtask"
 
     client = storage.Client()
-    bucket = client.bucket(BUCKET_name, PROJECT_name)
+    print(client)
+    bucket = client.get_bucket(BUCKET_name)
+    print(bucket)
     blobs_list = bucket.list_blobs()
-    updated_blobs = [blob for blob in blobs_list
-                     if blob.metadata["status"] == "updated"]
-
+    updated_blobs = [blob for blob in blobs_list if
+                     blob.metadata["status"] == "updated"]
+    print(updated_blobs)
     if updated_blobs:
         Variable.set(key="file_names", value=updated_blobs)
 
     for blob in updated_blobs:
-        blob.metadata = None
+        print(blob.metadata)
+        blob.metadata = {"status": "not updated"}
         blob.patch()
+        print(blob.metadata)
 
 
-def invoke_cloud_function():
-    url = "https://europe-west1-fair-solution-345912.cloudfunctions" \
-          ".net/to_update_bucket"
-    # the url is also the target audience.
-    request = google.auth.transport.requests.Request()  # this is a
-    # request for obtaining the the credentials
-    id_token_credentials = id_token_credential_utils. \
-        get_default_id_token_credentials(url, request=request)
-
-    filenames = Variable.get("file_names")
-    AuthorizedSession(id_token_credentials).request(
-        method="POST",
-        url=url,
-        json={"filenames": filenames}
-    )
+# def invoke_cloud_function():
+#     url = "https://europe-west1-fair-solution-345912.cloudfunctions" \
+#           ".net/to_update_bucket"
+#     # the url is also the target audience.
+#     request = google.auth.transport.requests.Request()  # this is a
+#     # request for obtaining the the credentials
+#     id_token_credentials = id_token_credential_utils. \
+#         get_default_id_token_credentials(url, request=request)
+#
+#     filenames = Variable.get("file_names")
+#     AuthorizedSession(id_token_credentials).request(
+#         method="POST",
+#         url=url,
+#         json={"filenames": filenames}
+#     )
 
 
 default_args = {
@@ -72,23 +73,14 @@ dag = DAG(
     tags=['example'],
 )
 
-# t1 = GCSObjectUpdateSensor(
-#     task_id='gcs_file_sensor_yesterday_task',
-#     bucket='crudtask',
-#     object="logs.csv",
-#     ts_func = ,
-#     dag=dag,
-#
-# )
-
 t1 = PythonOperator(
     task_id='get_folders',
     python_callable=updated_file_name,
     dag=dag
 )
-
-t2 = PythonOperator(task_id="invoke_cf",
-                    python_callable=invoke_cloud_function)
+#
+# t2 = PythonOperator(task_id="invoke_cf",
+#                     python_callable=invoke_cloud_function)
 
 # t3 = CloudFunctionInvokeFunctionOperator(
 #     function_id="ID of the function to be called str",
@@ -97,4 +89,4 @@ t2 = PythonOperator(task_id="invoke_cf",
 #     project_id='project_id str'
 # )
 
-t1 >> t2
+t1

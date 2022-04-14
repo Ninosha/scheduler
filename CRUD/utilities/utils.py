@@ -23,6 +23,10 @@ def check_if_updated(blob, old_hash, new_hash):
         metadata = {"status": "updated"}
         blob.metadata = metadata
         blob.patch()
+    else:
+        metadata = {"status": "not updated"}
+        blob.metadata = metadata
+        blob.patch()
 
 
 def get_hash(bucket, file_name):
