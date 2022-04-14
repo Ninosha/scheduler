@@ -1,6 +1,4 @@
 from CRUD.crud import CRUD
-from CRUD.utilities.utils import get_credentials
-from gcloud import storage
 
 credentials = "/home/ninosha/Desktop/crud_task/Credentials/" \
               "fair-solution-345912-e1b814ef61f8.json"
@@ -15,9 +13,9 @@ obj = CRUD(credentials_url=credentials,
 file_path_create = "/home/ninosha/Desktop/GCP_task_scheduler/Data/" \
                    "email-password-recovery-code.csv"
 
-# obj.crud_obj.creat_file("asdhja.csv", file_path_create)
+# obj.crud_obj.creat_file("as.csv", file_path_create)
 
-obj.crud_obj.update_file("sh.csv", file_path_create)
+obj.crud_obj.update_file("as.csv", file_path_create)
 # obj.crud_obj.update_file("hvhj.csv", file_path_create)
 #
 # print(obj.crud_obj.read_file("hvhj.csv",

@@ -10,52 +10,41 @@ from google.auth.transport.requests import AuthorizedSession
 
 
 def updated_file_name():
-    PROJECT_name = "My First Project"
     BUCKET_name = "crudtask"
 
     client = storage.Client()
-    print(client)
     bucket = client.get_bucket(BUCKET_name)
-    print(bucket)
     blobs_list = bucket.list_blobs()
-    updated_blobs = [blob for blob in blobs_list if
+    updated_blobs = [blob for blob in blobs_list if blob.metadata and
                      blob.metadata["status"] == "updated"]
-    print(updated_blobs)
-    if updated_blobs:
-        Variable.set(key="file_names", value=updated_blobs)
+
+    Variable.set(key="file_names", value=updated_blobs)
 
     for blob in updated_blobs:
-        print(blob.metadata)
         blob.metadata = {"status": "not updated"}
         blob.patch()
-        print(blob.metadata)
 
 
-# def invoke_cloud_function():
-#     url = "https://europe-west1-fair-solution-345912.cloudfunctions" \
-#           ".net/to_update_bucket"
-#     # the url is also the target audience.
-#     request = google.auth.transport.requests.Request()  # this is a
-#     # request for obtaining the the credentials
-#     id_token_credentials = id_token_credential_utils. \
-#         get_default_id_token_credentials(url, request=request)
-#
-#     filenames = Variable.get("file_names")
-#     AuthorizedSession(id_token_credentials).request(
-#         method="POST",
-#         url=url,
-#         json={"filenames": filenames}
-#     )
+def invoke_cloud_function():
+    filenames = Variable.get("file_names")
+    if filenames:
+        url = "https://europe-west1-fair-solution-345912.cloudfunctions" \
+              ".net/to_update_bucket"
+        # the url is also the target audience.
+        request = google.auth.transport.requests.Request()  # this is a
+        # request for obtaining the the credentials
+        id_token_credentials = id_token_credential_utils. \
+            get_default_id_token_credentials(url, request=request)
+
+        AuthorizedSession(id_token_credentials).request(
+            method="POST",
+            url=url,
+            json={"updated_blobs": filenames}
+        )
+    else:
+        return "files were not updated"
 
 
-default_args = {
-                   'depends_on_past': False,
-                   'email': ['airflow@example.com'],
-                   'email_on_failure': False,
-                   'email_on_retry': False,
-                   'retries': 1,
-                   'retry_delay': timedelta(minutes=5),
-               },
 dag = DAG(
     'listener_dag',
     default_args={
@@ -63,8 +52,7 @@ dag = DAG(
         'email': ['airflow@example.com'],
         'email_on_failure': False,
         'email_on_retry': False,
-        'retries': 1,
-        'retry_delay': timedelta(minutes=5)
+        'retries': 0
     },
     description='A simple tutorial DAG',
     schedule_interval="* * * * *",
@@ -79,8 +67,8 @@ t1 = PythonOperator(
     dag=dag
 )
 #
-# t2 = PythonOperator(task_id="invoke_cf",
-#                     python_callable=invoke_cloud_function)
+t2 = PythonOperator(task_id="invoke_cf",
+                    python_callable=invoke_cloud_function)
 
 # t3 = CloudFunctionInvokeFunctionOperator(
 #     function_id="ID of the function to be called str",
@@ -89,4 +77,4 @@ t1 = PythonOperator(
 #     project_id='project_id str'
 # )
 
-t1
+t1 >> t2
