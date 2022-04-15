@@ -58,6 +58,10 @@ def invoke_cloud_function():
         return ValueError(e)
 
     if updated_files_list:
+
+        Variable.set(key="updated_file_names", value=updated_files_list)
+
+
         url = "https://europe-west1-fair-solution-345912." \
               "cloudfunctions.net/to_update_bucket"
         try:
