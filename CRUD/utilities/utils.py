@@ -47,7 +47,7 @@ def get_hash(bucket, file_name):
 #
 
 def get_blob(bucket, file_name=None):
-    return bucket.blob(file_name)
+    return bucket.blob(file_name, chunk_size=3221225472)
 
 
 def get_credentials(credentials_url):

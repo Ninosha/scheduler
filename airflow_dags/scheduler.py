@@ -1,12 +1,14 @@
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import BranchPythonOperator
 from airflow.models import Variable
 from google.cloud import storage
 from airflow.providers.google.common.utils import \
     id_token_credentials as id_token_credential_utils
 import google.auth.transport.requests
 from google.auth.transport.requests import AuthorizedSession
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
 
 def updated_file_name():
@@ -15,7 +17,7 @@ def updated_file_name():
     sets updated files list in airflow environment variables
     :return: str/message
     """
-    
+
     BUCKET_name = "crudtask"
     try:
 
@@ -38,9 +40,11 @@ def updated_file_name():
         blob.patch()
         blob_names.append(blob.name)
 
-    Variable.set(key="file_names", value=blob_names)
-
-    return "result set as airflow environment variable"
+    if updated_files:
+        Variable.set(key="file_names", value=blob_names)
+        return "invoke_cf"
+    else:
+        return None
 
 
 def invoke_cloud_function():
@@ -60,7 +64,6 @@ def invoke_cloud_function():
     if updated_files_list:
 
         Variable.set(key="updated_file_names", value=updated_files_list)
-
 
         url = "https://europe-west1-fair-solution-345912." \
               "cloudfunctions.net/to_update_bucket"
@@ -102,21 +105,19 @@ dag = DAG(
     tags=['example'],
 )
 
-t1 = PythonOperator(
+t1 = BranchPythonOperator(
     task_id='get_folders',
     python_callable=updated_file_name,
     dag=dag
 )
 #
 t2 = PythonOperator(task_id="invoke_cf",
-                    python_callable=invoke_cloud_function)
+                    python_callable=invoke_cloud_function, dag=dag)
 
+t3 = TriggerDagRunOperator(
+    task_id="trigger_postgres_dag",
+    trigger_dag_id="postgres_dag",
+    reset_dag_run=False
+)
 
-# t3 = CloudFunctionInvokeFunctionOperator(
-#     function_id="ID of the function to be called str",
-#     input_data="Input to be passed to the function dict",
-#     location="The location where the function is located. str",
-#     project_id='project_id str'
-# )
-
-t1 >> t2
+t1 >> t2 >> t3

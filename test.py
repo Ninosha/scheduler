@@ -10,20 +10,15 @@ obj = CRUD(credentials_url=credentials,
            project_name=project_name,
            bucket_name=bucket_name)
 
-file_path_create = "/home/ninosha/Desktop/GCP_task_scheduler/Data/" \
-                   "email-password-recovery-code.csv"
+file_path_create = "/home/ninosha/Downloads/Data8277.csv"
 
-# obj.crud_obj.creat_file("as.csv", file_path_create)
+obj.crud_obj.creat_file("yellow_taxi_1gb.csv", file_path_create)
 
-obj.crud_obj.update_file("as.csv", file_path_create)
+# obj.crud_obj.update_file("yellow_taxi_1gb.csv", file_path_create)
 # obj.crud_obj.update_file("hvhj.csv", file_path_create)
 #
 # print(obj.crud_obj.read_file("hvhj.csv",
 # "/home/ninosha/Desktop/GCP_task_scheduler/Downloads"))
 # obj.crud_obj.delete_file("hvhj.csv")
-import json
-k = '["crudtask", "as.csv"]'
 
-# m = json.loads(k)
-print(eval(k))
 
