@@ -1,6 +1,6 @@
 from gcloud import storage
 from CRUD.utilities.crud_class import CRUDFuncs
-from CRUD.utilities.utils import get_credentials, get_blob
+from CRUD.utilities.utils import get_credentials
 
 
 class CRUD:
