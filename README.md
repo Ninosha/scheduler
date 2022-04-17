@@ -1,6 +1,6 @@
 # GCP Task Scheduler
  GCP Task Scheduler is a python module that is used to modify files in 
- bucket and save updated bucket to cloud storage and Postgres database. 
+ bucket and save to updated bucket to cloud storage and Postgres database. 
 - Module contains CRUD: create, read, update and delete functionalities. 
 - Cloud Composer/Apache Airflow is a listener and is triggered when file 
 content is updated and dag triggers a cloud function as a response.
