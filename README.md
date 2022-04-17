@@ -44,7 +44,7 @@ file_path_to_upload = "../Data/example.csv"
 obj.crud_obj.create_file("example_name.csv", file_path_to_upload)
 ```
 
-To read a file function needs to download needed file:
+To read a file function needs to download a file:
 
 ```python
 # define url where the file user needs to download file
