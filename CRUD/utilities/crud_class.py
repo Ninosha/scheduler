@@ -19,7 +19,7 @@ class CRUDFuncs:
 
         :param file_name: str/file name
         :param file_path: str/file path
-        :return: message if operation was successful, else - error
+        :return: str/message
         """
         try:
             blobs_list = list(self.bucket.list_blobs())
@@ -42,7 +42,7 @@ class CRUDFuncs:
 
         :param file_name: str/file name
         :param path_to_download: string url
-        :return: message if operation was successful, else - error
+        :return: str/message
         """
         try:
             get_blob(self.bucket, file_name). \
@@ -62,7 +62,7 @@ class CRUDFuncs:
         updates file from file path to bucket
         :param file_name: str/file name
         :param filepath: str/file path
-        :return: message if operation was successful, else - error
+        :return: str/message
         """
 
         blob = get_blob(self.bucket, file_name)
@@ -89,7 +89,7 @@ class CRUDFuncs:
         """
         deletes file with filename
         :param file_name: str/file name
-        :return: message if operation was successful, else - error
+        :return: str/message
         """
         try:
             self.bucket.delete_blob(file_name)

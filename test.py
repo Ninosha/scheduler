@@ -12,13 +12,22 @@ obj = CRUD(credentials_url=credentials,
 
 file_path_create = "/home/ninosha/Downloads/5m-Sales-Records1.csv"
 
+# create
+
 # obj.crud_obj.create_file("5m-sales-records.csv", file_path_create)
 
+# update
+
 obj.crud_obj.update_file("5m-sales-records.csv", file_path_create)
-# obj.crud_obj.update_file("hvhj.csv", file_path_create)
-#
-# print(obj.crud_obj.read_file("hvhj.csv",
-# "/home/ninosha/Desktop/GCP_task_scheduler/Downloads"))
-# obj.crud_obj.delete_file("hvhj.csv")
+# read
+
+# path_to_download = "/home/ninosha/Desktop/GCP_task_scheduler
+# /Downloads"
+
+# obj.crud_obj.read_file("5m-sales-records.csv.csv", path_to_download)
+
+# delete
+
+# obj.crud_obj.delete_file("5m-sales-records.csv.csv")
 
 
