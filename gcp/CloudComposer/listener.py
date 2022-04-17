@@ -10,8 +10,6 @@ import google.auth.transport.requests
 from google.auth.transport.requests import AuthorizedSession
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
-BUCKET_name = "crudtask"
-
 
 def updated_file_name():
     """
@@ -19,6 +17,7 @@ def updated_file_name():
     sets updated files list in airflow environment variables
     :return: str/message
     """
+    BUCKET_name = Variable.get("bucket_name")
 
     try:
 
