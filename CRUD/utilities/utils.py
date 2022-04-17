@@ -4,6 +4,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 def jsonfile_to_dict(url):
     """
+    function converts json to dictionary
     :param url: str/url of a json file
     :return: dictionary
     """
@@ -15,31 +16,53 @@ def jsonfile_to_dict(url):
 
 def check_if_updated(blob, old_hash, new_hash):
     """
+    function checks if blob was updated with hashes,
+    if updated, adds blob metadata status - updated
+    if not updated, adds status - not updated
 
-    :param blob:
-    :param old_hash:
-    :param new_hash:
-    :return:
+    :param blob: blob obj
+    :param old_hash: str/blob.md5_hash
+    :param new_hash: str/blob.md5_hash
+    :return: str/message
     """
 
     if old_hash != new_hash:
         metadata = {"status": "updated"}
         blob.metadata = metadata
         blob.patch()
+
+        return "metadata status: updated"
+
     else:
         metadata = {"status": "not updated"}
         blob.metadata = metadata
         blob.patch()
 
+        return "metadata status: not updated"
+
 
 def get_hash(bucket, file_name):
+    """
+    function returns hash of a file
+    :param bucket: bucket obj
+    :param file_name: str/filename
+    :return: str/file hash
+    """
+
     blobs = list(bucket.list_blobs())
     file_hash = [blob.md5_hash for blob in blobs if blob.name ==
                  file_name]
+
     return file_hash
 
 
 def get_blob(bucket, file_name=None):
+    """
+    function returns blob object
+    :param bucket: bucket obj
+    :param file_name: str/None
+    :return: blob obj
+    """
     return bucket.blob(file_name, chunk_size=3221225472)
 
 
