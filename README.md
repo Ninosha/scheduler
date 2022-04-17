@@ -1,40 +1,80 @@
 # GCP Task Scheduler
- GCP Task Scheduler is a python module connected to GCP. 
-Module contains CRUD, create, read, update and delete, functionality. 
-Cloud Composer/Apache Airflow is a listener and is triggered when file 
+ GCP Task Scheduler is a python module that is used to modify files in 
+ bucket and save updated bucket to cloud storage and Postgres database. 
+- Module contains CRUD: create, read, update and delete functionalities. 
+- Cloud Composer/Apache Airflow is a listener and is triggered when file 
 content is updated and dag triggers a cloud function as a response.
-Cloud Function moves updated file from original bucket to updated bucket,
-listener dag also triggers dag to insert updated data into Postgres 
- database.
+- Cloud Function moves updated file from original bucket to updated bucket.
+- Listener dag also triggers dag to insert updated data into Postgres 
+ database, with a table name "filename + time".
 
-
-## Use
-
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
-
-```bash
-pip install foobar
-```
 
 ## Usage
 
+Import CRUD module to use crud functionality
+
 ```python
-import foobar
+from CRUD.crud_funcs import CRUD
+```
+To use CRUD functions, user needs to create crud object first
 
-# returns 'words'
-foobar.pluralize('word')
+```python
+# credentials url to authorise your google cloud client
+credentials = "../user_credentials_url.json"
+# project name
+project_name = "Project Name"
+# bucket name
+bucket_name = "BucketName"
 
-# returns 'geese'
-foobar.pluralize('goose')
+# create object with parameters needed 
+obj= CRUD(
+         credentials_url=credentials,
+         project_name=project_name,
+         bucket_name=bucket_name
+)
+```
+To create file:
 
-# returns 'phenomenon'
-foobar.singularize('phenomena')
+```python
+# define url where the file user needs to upload from
+file_path_to_upload = "../Data/example.csv"
+
+# call the create_file function, pass the name to be saved in the bucket
+# and file url already defined
+obj.crud_obj.create_file("example_name.csv", file_path_to_upload)
 ```
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+To read a file function needs to download needed file:
 
-Please make sure to update tests as appropriate.
+```python
+# define url where the file user needs to download file
+file_path_to_download = "../Read_data"
 
-## License
-[MIT](https://choosealicense.com/licenses/mit/)
+# call update_file function, pass the name of  a file needed to be read
+# and file url already defined
+obj.crud_obj.read_file("example.csv",file_path_to_download)
+
+```
+
+To update a file:
+```python
+# define url where the file user needs to upload from
+file_path_to_update = "../Data/example_update.csv"
+
+# call update_file function, pass the name of  a file needed to be updated
+# and file url already defined
+
+obj.crud_obj.update_file("example_name.csv", file_path_to_update)
+```
+- when file is being updated program checks if file's content has changed, 
+if it has Cloud Composer triggers Cloud Function which copies updated 
+file from original bucket to updated bucket and triggers Second dag in 
+composer to save file in postgres database.
+
+
+ To delete a file:
+```python
+# call a function delete_file and pass the name of a file needed to be deleted
+obj.crud_obj.delete_file("example.csv")
+```
+

@@ -1,4 +1,4 @@
-from CRUD.crud import CRUD
+from CRUD.crud_funcs import CRUD
 
 credentials = "/home/ninosha/Desktop/crud_task/Credentials/" \
               "fair-solution-345912-e1b814ef61f8.json"
@@ -12,7 +12,7 @@ obj = CRUD(credentials_url=credentials,
 
 file_path_create = "/home/ninosha/Downloads/5m-Sales-Records1.csv"
 
-# obj.crud_obj.creat_file("5m-sales-records.csv", file_path_create)
+# obj.crud_obj.create_file("5m-sales-records.csv", file_path_create)
 
 obj.crud_obj.update_file("5m-sales-records.csv", file_path_create)
 # obj.crud_obj.update_file("hvhj.csv", file_path_create)

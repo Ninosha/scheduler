@@ -13,7 +13,7 @@ class CRUDFuncs:
         """
         self.bucket = bucket
 
-    def creat_file(self, file_name, file_path):
+    def create_file(self, file_name, file_path):
         """
         uploads file from file path to bucket
 
