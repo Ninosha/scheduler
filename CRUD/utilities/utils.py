@@ -1,9 +1,5 @@
-import csv
 import json
-import os
-from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials
-from VARS import logs_path
 
 
 def jsonfile_to_dict(url):
@@ -18,6 +14,13 @@ def jsonfile_to_dict(url):
 
 
 def check_if_updated(blob, old_hash, new_hash):
+    """
+
+    :param blob:
+    :param old_hash:
+    :param new_hash:
+    :return:
+    """
 
     if old_hash != new_hash:
         metadata = {"status": "updated"}
@@ -35,16 +38,6 @@ def get_hash(bucket, file_name):
                  file_name]
     return file_hash
 
-
-# def read_json(path):
-#     with open(path, "r") as file:
-#         return json.load(file)
-#
-#
-# def write_json(path, data):
-#     with open(path, "w") as file:
-#         return json.dump(data, file)
-#
 
 def get_blob(bucket, file_name=None):
     return bucket.blob(file_name, chunk_size=3221225472)

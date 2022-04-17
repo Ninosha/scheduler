@@ -9,6 +9,7 @@ class CRUDFuncs:
 
     def __init__(self, bucket):
         """
+        :param bucket: bucket obj
         """
         self.bucket = bucket
 
@@ -75,7 +76,7 @@ class CRUDFuncs:
             new_hash = get_hash(self.bucket, file_name)
 
             check_if_updated(blob, old_hash, new_hash)
-            print(blob)
+            print(f"{file_name} was updated")
             return f"{file_name} was updated"
 
         except FileNotFoundError as f:
