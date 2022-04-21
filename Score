@@ -1,0 +1,30 @@
+Code State (working/Not Working/Partially )     ===> max 10 points = ACHI: 8    GUJA: XX  ALEX: XX
+Code readability                                ===> max 20 points = ACHI: 17   GUJA: XX  ALEX: XX
+Code structure                                  ===> max 20 points = ACHI: 12   GUJA: XX  ALEX: XX
+Code Idea                                       ===> max 20 points = ACHI: 20   GUJA: XX  ALEX: XX
+Code Readme + Doc_string                        ===> max 20 points = ACHI: 15   GUJA: XX  ALEX: XX
+Repo State                                      ===> max 10 points = ACHI: 5    GUJA: XX  ALEX: XX
+Total:                                                               ACHI: 77   GUJA: XX  ALEX: XX
+
+# =============================================================================
+REMARKS from Archil:
+
+# State
+# dags failing when can be no new files. here you can use branching.
+
+# readability
+# bad variable Name, Non pep BUCKET_name
+# no describing comments
+
+# structure
+# didn't used CRUD for CF
+# hardcoded connections strings
+# didn't used BranchPythonOperator as branching the dags with at least two outcomes
+# Try/Except NotImplementedError, shouldn't be used as a general exception
+
+# Repo
+# service account creds in repo
+# only main branch in repo, you should've have at least dev branch which you'd merge with main.
+
+# Readme
+# not described how the GCP works. only CRUD.
