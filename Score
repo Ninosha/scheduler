@@ -1,10 +1,10 @@
-Code State (working/Not Working/Partially )     ===> max 10 points = ACHI: 8    GUJA: XX  ALEX: XX
-Code readability                                ===> max 20 points = ACHI: 17   GUJA: XX  ALEX: XX
-Code structure                                  ===> max 20 points = ACHI: 12   GUJA: XX  ALEX: XX
-Code Idea                                       ===> max 20 points = ACHI: 20   GUJA: XX  ALEX: XX
-Code Readme + Doc_string                        ===> max 20 points = ACHI: 15   GUJA: XX  ALEX: XX
-Repo State                                      ===> max 10 points = ACHI: 5    GUJA: XX  ALEX: XX
-Total:                                                               ACHI: 77   GUJA: XX  ALEX: XX
+Code State (working/Not Working/Partially )     ===> max 10 points = ACHI: 8    GUJA: XX  ALEX: 5
+Code readability                                ===> max 20 points = ACHI: 17   GUJA: XX  ALEX: 15
+Code structure                                  ===> max 20 points = ACHI: 12   GUJA: XX  ALEX: 10
+Code Idea                                       ===> max 20 points = ACHI: 20   GUJA: XX  ALEX: 18
+Code Readme + Doc_string                        ===> max 20 points = ACHI: 15   GUJA: XX  ALEX: 10
+Repo State                                      ===> max 10 points = ACHI: 5    GUJA: XX  ALEX: 2
+Total:                                                               ACHI: 77   GUJA: XX  ALEX: 77
 
 # =============================================================================
 REMARKS from Archil:
@@ -28,3 +28,11 @@ REMARKS from Archil:
 
 # Readme
 # not described how the GCP works. only CRUD.
+
+Commenst from Alex:
+DO NOT UPLOAD YOUR CREDENTIALS TO REPO! :)
+The descriptions and comments are limited and hard
+to understand.
+Commit Descriptions are also ambigious, although 
+having the type of commit (update, fix, etc) was very nice.
+Overall Good job, but you can do better!
